@@ -1,4 +1,7 @@
 import { type FormEvent, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 interface TodoFormProps {
   onAdd: (title: string) => void
@@ -19,18 +22,25 @@ export function TodoForm({ onAdd, isAdding }: TodoFormProps) {
   }
 
   return (
-    <form className="todo-form" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        className="todo-input"
-        placeholder="What needs to be done?"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
-        disabled={isAdding}
-      />
-      <button type="submit" className="todo-add-button" disabled={isAdding || !title.trim()}>
-        {isAdding ? 'Adding…' : 'Add'}
-      </button>
+    <form onSubmit={handleSubmit} className="mb-6">
+      <FieldGroup>
+        <Field orientation="horizontal" className="items-stretch gap-2 sm:items-center">
+          <FieldLabel htmlFor="todo-title" className="sr-only">
+            Todo title
+          </FieldLabel>
+          <Input
+            id="todo-title"
+            className="min-w-0 flex-1"
+            placeholder="What needs to be done?"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            disabled={isAdding}
+          />
+          <Button type="submit" disabled={isAdding || !title.trim()}>
+            {isAdding ? 'Adding…' : 'Add'}
+          </Button>
+        </Field>
+      </FieldGroup>
     </form>
   )
 }

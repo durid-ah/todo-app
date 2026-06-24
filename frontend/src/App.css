@@ -21,41 +21,6 @@
   color: #dc2626;
 }
 
-.todo-form {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.todo-input {
-  flex: 1;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.todo-input:focus {
-  outline: 2px solid #93c5fd;
-  border-color: #93c5fd;
-}
-
-.todo-add-button {
-  padding: 0.625rem 1rem;
-  border: none;
-  border-radius: 8px;
-  background: #2563eb;
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.todo-add-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .todo-empty {
   color: #64748b;
   font-size: 0.875rem;
