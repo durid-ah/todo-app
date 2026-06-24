@@ -55,3 +55,11 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Node / Vite
+node_modules/
+frontend/dist/
+.env.local
+
+# SQLite
+*.db
