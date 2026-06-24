@@ -1,5 +1,6 @@
-import type { Todo } from '../types/todo'
-import { TodoItem } from './TodoItem'
+import type { Todo } from '@/types/todo'
+import { TodoItem } from '@/components/TodoItem'
+import { FieldGroup } from '@/components/ui/field'
 
 interface TodoListProps {
   todos: Todo[]
@@ -10,11 +11,13 @@ interface TodoListProps {
 
 export function TodoList({ todos, onToggle, onEdit, onDelete }: TodoListProps) {
   if (todos.length === 0) {
-    return <p className="todo-empty">No todos yet. Add one above.</p>
+    return (
+      <p className="text-sm text-muted-foreground">No todos yet. Add one above.</p>
+    )
   }
 
   return (
-    <ul className="todo-list">
+    <FieldGroup className="gap-2 text-left">
       {todos.map((todo) => (
         <TodoItem
           key={todo.id}
@@ -24,6 +27,6 @@ export function TodoList({ todos, onToggle, onEdit, onDelete }: TodoListProps) {
           onDelete={onDelete}
         />
       ))}
-    </ul>
+    </FieldGroup>
   )
 }

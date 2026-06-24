@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
-import type { Todo } from '../types/todo'
+import type { Todo } from '@/types/todo'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Field } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 interface TodoItemProps {
   todo: Todo
@@ -29,17 +34,21 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
   }
 
   return (
-    <li className={`todo-item${todo.isCompleted ? ' todo-item-completed' : ''}`}>
-      <input
-        type="checkbox"
-        className="todo-checkbox"
+    <Field
+      orientation="horizontal"
+      className="items-center gap-3 rounded-lg border border-border bg-card p-3"
+    >
+      <Checkbox
         checked={todo.isCompleted}
-        onChange={() => onToggle(todo)}
+        onCheckedChange={() => onToggle(todo)}
         aria-label={`Mark "${todo.title}" as ${todo.isCompleted ? 'incomplete' : 'complete'}`}
       />
-      <input
-        type="text"
-        className="todo-title"
+      <Input
+        aria-label={`Edit todo "${todo.title}"`}
+        className={cn(
+          'min-w-0 flex-1 border-transparent bg-transparent shadow-none focus-visible:border-input',
+          todo.isCompleted && 'text-muted-foreground line-through',
+        )}
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         onBlur={saveTitle}
@@ -49,14 +58,15 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
           }
         }}
       />
-      <button
+      <Button
         type="button"
-        className="todo-delete-button"
+        variant="destructive"
+        size="sm"
         onClick={() => onDelete(todo.id)}
         aria-label={`Delete "${todo.title}"`}
       >
         Delete
-      </button>
-    </li>
+      </Button>
+    </Field>
   )
 }
