@@ -16,7 +16,7 @@ function App() {
   return (
     <main className="app">
       <h1>Todo App</h1>
-      <p className="subtitle">Full-stack scaffold — .NET 10 API + React</p>
+      <p className="subtitle">Plan your projects</p>
 
       <TodoForm onAdd={todoActions.addTodo} isAdding={isAdding} />
 
