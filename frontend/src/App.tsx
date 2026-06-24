@@ -9,10 +9,7 @@ function App() {
     isLoading,
     isError,
     error,
-    addTodo,
-    toggleTodo,
-    editTodo,
-    removeTodo,
+    todoActions,
     isAdding,
   } = useTodos()
 
@@ -21,7 +18,7 @@ function App() {
       <h1>Todo App</h1>
       <p className="subtitle">Full-stack scaffold — .NET 10 API + React</p>
 
-      <TodoForm onAdd={addTodo} isAdding={isAdding} />
+      <TodoForm onAdd={todoActions.addTodo} isAdding={isAdding} />
 
       {isLoading && <p className="loading">Loading todos…</p>}
 
@@ -34,9 +31,9 @@ function App() {
       {!isLoading && !isError && (
         <TodoList
           todos={todos}
-          onToggle={toggleTodo}
-          onEdit={editTodo}
-          onDelete={removeTodo}
+          onToggle={todoActions.toggleTodo}
+          onEdit={todoActions.editTodo}
+          onDelete={todoActions.removeTodo}
         />
       )}
     </main>

@@ -38,16 +38,18 @@ export function useTodos() {
     isLoading,
     isError,
     error,
-    addTodo: (title: string) => createMutation.mutate(title),
-    toggleTodo: (todo: Todo) =>
-      updateMutation.mutate({
-        id: todo.id,
-        title: todo.title,
-        isCompleted: !todo.isCompleted,
-      }),
-    editTodo: (id: number, title: string, isCompleted: boolean) =>
-      updateMutation.mutate({ id, title, isCompleted }),
-    removeTodo: (id: number) => deleteMutation.mutate(id),
+    todoActions: {
+      addTodo: (title: string) => createMutation.mutate(title),
+      toggleTodo: (todo: Todo) =>
+        updateMutation.mutate({
+          id: todo.id,
+          title: todo.title,
+          isCompleted: !todo.isCompleted,
+        }),
+      editTodo: (id: number, title: string, isCompleted: boolean) =>
+        updateMutation.mutate({ id, title, isCompleted }),
+      removeTodo: (id: number) => deleteMutation.mutate(id),
+    },
     isAdding: createMutation.isPending,
   }
 }
