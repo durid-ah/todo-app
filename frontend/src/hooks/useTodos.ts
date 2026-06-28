@@ -9,28 +9,29 @@ interface UpdateTodoVariables {
   isCompleted: boolean
 }
 
-export function useTodos() {
+export function useTodos(email: string) {
   const queryClient = useQueryClient()
+  const queryKey = todoKeys.list(email)
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: todoKeys.all,
+    queryKey,
     queryFn: fetchTodos,
   })
 
   const createMutation = useMutation({
     mutationFn: createTodo,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, title, isCompleted }: UpdateTodoVariables) =>
       updateTodo(id, { title, isCompleted }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   })
 
   const deleteMutation = useMutation({
     mutationFn: deleteTodo,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   })
 
   return {

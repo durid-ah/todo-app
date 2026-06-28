@@ -1,3 +1,4 @@
+import { authFetch } from './authFetch'
 import type { AuthResponse } from '../types/auth'
 import type { Todo } from '../types/todo'
 
@@ -9,7 +10,10 @@ interface ApiErrorBody {
   error?: string
 }
 
-async function parseErrorResponse(response: Response): Promise<string> {
+async function parseErrorResponse(
+  response: Response,
+  options?: { sessionExpired?: boolean },
+): Promise<string> {
   try {
     const body = (await response.json()) as ApiErrorBody
     if (body.error) return body.error
@@ -17,13 +21,21 @@ async function parseErrorResponse(response: Response): Promise<string> {
     // ignore parse errors
   }
 
-  if (response.status === 401) return 'Invalid email or password.'
+  if (response.status === 401) {
+    return options?.sessionExpired
+      ? 'Session expired. Please sign in again.'
+      : 'Invalid email or password.'
+  }
   return `Request failed (${response.status})`
 }
 
-async function handleResponse<T>(response: Response, errorPrefix: string): Promise<T> {
+async function handleResponse<T>(
+  response: Response,
+  errorPrefix: string,
+  options?: { sessionExpired?: boolean },
+): Promise<T> {
   if (!response.ok) {
-    const message = await parseErrorResponse(response)
+    const message = await parseErrorResponse(response, options)
     throw new Error(message || `${errorPrefix}: ${response.status}`)
   }
 
@@ -58,37 +70,37 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
 }
 
 export async function fetchTodos(): Promise<Todo[]> {
-  const response = await fetch('/api/todos')
-  return handleResponse<Todo[]>(response, 'Failed to fetch todos')
+  const response = await authFetch('/api/todos')
+  return handleResponse<Todo[]>(response, 'Failed to fetch todos', { sessionExpired: true })
 }
 
 export async function fetchTodo(id: number): Promise<Todo> {
-  const response = await fetch(`/api/todos/${id}`)
-  return handleResponse<Todo>(response, 'Failed to fetch todo')
+  const response = await authFetch(`/api/todos/${id}`)
+  return handleResponse<Todo>(response, 'Failed to fetch todo', { sessionExpired: true })
 }
 
 export async function createTodo(title: string): Promise<Todo> {
-  const response = await fetch('/api/todos', {
+  const response = await authFetch('/api/todos', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title }),
   })
-  return handleResponse<Todo>(response, 'Failed to create todo')
+  return handleResponse<Todo>(response, 'Failed to create todo', { sessionExpired: true })
 }
 
 export async function updateTodo(
   id: number,
   data: { title: string; isCompleted: boolean },
 ): Promise<Todo> {
-  const response = await fetch(`/api/todos/${id}`, {
+  const response = await authFetch(`/api/todos/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
-  return handleResponse<Todo>(response, 'Failed to update todo')
+  return handleResponse<Todo>(response, 'Failed to update todo', { sessionExpired: true })
 }
 
 export async function deleteTodo(id: number): Promise<void> {
-  const response = await fetch(`/api/todos/${id}`, { method: 'DELETE' })
-  await handleResponse<void>(response, 'Failed to delete todo')
+  const response = await authFetch(`/api/todos/${id}`, { method: 'DELETE' })
+  await handleResponse<void>(response, 'Failed to delete todo', { sessionExpired: true })
 }

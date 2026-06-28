@@ -15,7 +15,7 @@ function TodoApp({ user, signOut }: { user: AuthSession; signOut: () => void }) 
     error,
     todoActions,
     isAdding,
-  } = useTodos()
+  } = useTodos(user.email)
 
   return (
     <main className="app">
