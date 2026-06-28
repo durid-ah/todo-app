@@ -42,4 +42,17 @@ public class AuthController : ControllerBase
             _ => Problem(),
         };
     }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+    {
+        var result = await _authService.RefreshAsync(request.RefreshToken);
+
+        return result.Status switch
+        {
+            AuthResultStatus.Success => Ok(result.Response),
+            AuthResultStatus.InvalidRefreshToken => Unauthorized(),
+            _ => Problem(),
+        };
+    }
 }
