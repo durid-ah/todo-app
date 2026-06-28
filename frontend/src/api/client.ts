@@ -1,12 +1,30 @@
+import type { AuthResponse } from '../types/auth'
 import type { Todo } from '../types/todo'
 
 export interface HealthResponse {
   status: string
 }
 
+interface ApiErrorBody {
+  error?: string
+}
+
+async function parseErrorResponse(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as ApiErrorBody
+    if (body.error) return body.error
+  } catch {
+    // ignore parse errors
+  }
+
+  if (response.status === 401) return 'Invalid email or password.'
+  return `Request failed (${response.status})`
+}
+
 async function handleResponse<T>(response: Response, errorPrefix: string): Promise<T> {
   if (!response.ok) {
-    throw new Error(`${errorPrefix}: ${response.status}`)
+    const message = await parseErrorResponse(response)
+    throw new Error(message || `${errorPrefix}: ${response.status}`)
   }
 
   if (response.status === 204) {
@@ -19,6 +37,24 @@ async function handleResponse<T>(response: Response, errorPrefix: string): Promi
 export async function fetchHealth(): Promise<HealthResponse> {
   const response = await fetch('/api/health')
   return handleResponse<HealthResponse>(response, 'Health check failed')
+}
+
+export async function signUp(email: string, password: string): Promise<AuthResponse> {
+  const response = await fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  return handleResponse<AuthResponse>(response, 'Sign up failed')
+}
+
+export async function signIn(email: string, password: string): Promise<AuthResponse> {
+  const response = await fetch('/api/auth/signin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  return handleResponse<AuthResponse>(response, 'Sign in failed')
 }
 
 export async function fetchTodos(): Promise<Todo[]> {
