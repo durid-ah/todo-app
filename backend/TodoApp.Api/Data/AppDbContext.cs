@@ -20,6 +20,13 @@ public class AppDbContext : DbContext
 
             entity.Property(t => t.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasIndex(t => t.UserId);
+
+            entity.HasOne(t => t.User)
+                .WithMany(u => u.Todos)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<User>(entity =>
