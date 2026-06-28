@@ -1,12 +1,22 @@
+import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AUTH_SESSION_EXPIRED_EVENT } from '@/api/authFetch'
 import { signIn, signUp } from '@/api/client'
-import { authKeys } from '@/api/queryKeys'
+import { authKeys, todoKeys } from '@/api/queryKeys'
 import { clearSession, getStoredSession, saveSession } from '@/lib/authStorage'
-import type { AuthSession } from '@/types/auth'
+import type { AuthResponse, AuthSession } from '@/types/auth'
 
 interface AuthCredentials {
   email: string
   password: string
+}
+
+function toAuthSession(data: AuthResponse): AuthSession {
+  return {
+    token: data.token,
+    refreshToken: data.refreshToken,
+    email: data.email,
+  }
 }
 
 export function useAuth() {
@@ -18,10 +28,22 @@ export function useAuth() {
     staleTime: Infinity,
   })
 
+  useEffect(() => {
+    function handleSessionExpired() {
+      clearSession()
+      queryClient.setQueryData(authKeys.session, null)
+      queryClient.removeQueries({ queryKey: todoKeys.all })
+    }
+
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired)
+    return () =>
+      window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired)
+  }, [queryClient])
+
   const signInMutation = useMutation({
     mutationFn: ({ email, password }: AuthCredentials) => signIn(email, password),
     onSuccess: (data) => {
-      const authSession: AuthSession = { token: data.token, email: data.email }
+      const authSession = toAuthSession(data)
       saveSession(authSession)
       queryClient.setQueryData(authKeys.session, authSession)
     },
@@ -30,7 +52,7 @@ export function useAuth() {
   const signUpMutation = useMutation({
     mutationFn: ({ email, password }: AuthCredentials) => signUp(email, password),
     onSuccess: (data) => {
-      const authSession: AuthSession = { token: data.token, email: data.email }
+      const authSession = toAuthSession(data)
       saveSession(authSession)
       queryClient.setQueryData(authKeys.session, authSession)
     },
@@ -39,6 +61,7 @@ export function useAuth() {
   function signOut() {
     clearSession()
     queryClient.setQueryData(authKeys.session, null)
+    queryClient.removeQueries({ queryKey: todoKeys.all })
   }
 
   return {
