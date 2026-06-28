@@ -3,7 +3,7 @@ import type { Todo } from '@/types/todo'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldGroup } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { TODO_TITLE_MAX_LENGTH, validateTodoTitle } from '@/lib/todoValidation'
 
@@ -44,28 +44,31 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
     <FieldGroup className="gap-1">
       <Field
         orientation="horizontal"
-        className="items-center gap-3 rounded-lg border border-border bg-card p-3"
+        className="items-start gap-3 rounded-lg border border-border bg-card p-3"
       >
         <Checkbox
           checked={todo.isCompleted}
           onCheckedChange={() => onToggle(todo)}
+          className="mt-2"
           aria-label={`Mark "${todo.title}" as ${todo.isCompleted ? 'incomplete' : 'complete'}`}
         />
-        <Input
+        <Textarea
           aria-label={`Edit todo "${todo.title}"`}
           className={cn(
-            'min-w-0 flex-1 border-transparent bg-transparent shadow-none focus-visible:border-input',
+            'min-h-8 min-w-0 flex-1 resize-none border-transparent bg-transparent py-1.5 shadow-none focus-visible:border-input',
             todo.isCompleted && 'text-muted-foreground line-through',
           )}
           value={title}
           maxLength={TODO_TITLE_MAX_LENGTH}
+          rows={1}
           onChange={(event) => {
-            setTitle(event.target.value)
+            setTitle(event.target.value.replace(/\n/g, ''))
             setError(null)
           }}
           onBlur={saveTitle}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault()
               event.currentTarget.blur()
             }
           }}
@@ -75,6 +78,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
           type="button"
           variant="destructive"
           size="sm"
+          className="shrink-0"
           onClick={() => onDelete(todo.id)}
           aria-label={`Delete "${todo.title}"`}
         >
