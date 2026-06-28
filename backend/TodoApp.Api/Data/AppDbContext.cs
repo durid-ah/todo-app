@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Todo> Todos => Set<Todo>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +19,22 @@ public class AppDbContext : DbContext
                 .HasMaxLength(200);
 
             entity.Property(t => t.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Property(u => u.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(u => u.PasswordHash)
+                .IsRequired();
+
+            entity.HasIndex(u => u.Email)
+                .IsUnique();
+
+            entity.Property(u => u.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
     }
