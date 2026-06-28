@@ -1,9 +1,13 @@
-import { TodoForm } from './components/TodoForm'
-import { TodoList } from './components/TodoList'
-import { useTodos } from './hooks/useTodos'
+import { AuthPage } from '@/components/AuthPage'
+import { TodoForm } from '@/components/TodoForm'
+import { TodoList } from '@/components/TodoList'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/useAuth'
+import { useTodos } from '@/hooks/useTodos'
+import type { AuthSession } from '@/types/auth'
 import './App.css'
 
-function App() {
+function TodoApp({ user, signOut }: { user: AuthSession; signOut: () => void }) {
   const {
     todos,
     isLoading,
@@ -15,6 +19,13 @@ function App() {
 
   return (
     <main className="app">
+      <header className="app-header">
+        <span className="user-email">{user.email}</span>
+        <Button type="button" variant="outline" size="sm" onClick={signOut}>
+          Sign out
+        </Button>
+      </header>
+
       <h1>Todo App</h1>
       <p className="subtitle">Plan your day</p>
 
@@ -38,6 +49,24 @@ function App() {
       )}
     </main>
   )
+}
+
+function App() {
+  const { isAuthenticated, isLoading, user, signOut } = useAuth()
+
+  if (isLoading) {
+    return (
+      <main className="app">
+        <p className="loading">Loading…</p>
+      </main>
+    )
+  }
+
+  if (!isAuthenticated || !user) {
+    return <AuthPage />
+  }
+
+  return <TodoApp user={user} signOut={signOut} />
 }
 
 export default App
