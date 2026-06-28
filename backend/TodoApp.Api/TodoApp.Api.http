@@ -1,4 +1,6 @@
 @TodoApp.Api_HostAddress = http://localhost:5000
+@token = {{signin.response.body.token}}
+@refreshToken = {{signin.response.body.refreshToken}}
 
 ### Health
 GET {{TodoApp.Api_HostAddress}}/api/health
@@ -14,6 +16,7 @@ Content-Type: application/json
 }
 
 ### Sign in
+# @name signin
 POST {{TodoApp.Api_HostAddress}}/api/auth/signin
 Content-Type: application/json
 
@@ -22,14 +25,42 @@ Content-Type: application/json
   "password": "password123"
 }
 
-### List todos
+### Refresh tokens
+POST {{TodoApp.Api_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### List todos (unauthenticated — expect 401)
 GET {{TodoApp.Api_HostAddress}}/api/todos
 Accept: application/json
+
+### List todos (authenticated)
+GET {{TodoApp.Api_HostAddress}}/api/todos
+Accept: application/json
+Authorization: Bearer {{token}}
 
 ### Create todo
 POST {{TodoApp.Api_HostAddress}}/api/todos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "Test todo"
 }
+
+### Update todo
+PUT {{TodoApp.Api_HostAddress}}/api/todos/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Updated todo",
+  "isCompleted": true
+}
+
+### Delete todo
+DELETE {{TodoApp.Api_HostAddress}}/api/todos/1
+Authorization: Bearer {{token}}

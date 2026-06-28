@@ -7,5 +7,4 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Todo> Todos { get; set; } = [];
-    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }

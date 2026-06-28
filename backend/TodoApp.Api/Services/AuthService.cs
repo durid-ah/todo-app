@@ -11,7 +11,6 @@ public enum AuthResultStatus
     ValidationError,
     DuplicateEmail,
     InvalidCredentials,
-    InvalidRefreshToken,
 }
 
 public record AuthResult(AuthResultStatus Status, AuthResponse? Response = null, string? Error = null);
@@ -49,7 +48,7 @@ public class AuthService
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
 
-        return new AuthResult(AuthResultStatus.Success, await CreateAuthResponseAsync(user));
+        return new AuthResult(AuthResultStatus.Success, _tokenService.CreateToken(user));
     }
 
     public async Task<AuthResult> SignInAsync(string email, string password)
@@ -64,47 +63,7 @@ public class AuthService
         if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             return new AuthResult(AuthResultStatus.InvalidCredentials, Error: "Invalid email or password.");
 
-        return new AuthResult(AuthResultStatus.Success, await CreateAuthResponseAsync(user));
-    }
-
-    public async Task<AuthResult> RefreshAsync(string refreshToken)
-    {
-        if (string.IsNullOrWhiteSpace(refreshToken))
-            return new AuthResult(AuthResultStatus.InvalidRefreshToken);
-
-        var tokenHash = _tokenService.HashToken(refreshToken);
-        var storedToken = await _db.RefreshTokens
-            .Include(r => r.User)
-            .FirstOrDefaultAsync(r =>
-                r.TokenHash == tokenHash &&
-                r.RevokedAt == null &&
-                r.ExpiresAt > DateTime.UtcNow);
-
-        if (storedToken is null)
-            return new AuthResult(AuthResultStatus.InvalidRefreshToken);
-
-        storedToken.RevokedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
-
-        return new AuthResult(AuthResultStatus.Success, await CreateAuthResponseAsync(storedToken.User));
-    }
-
-    private async Task<AuthResponse> CreateAuthResponseAsync(User user)
-    {
-        var accessToken = _tokenService.CreateAccessToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-
-        _db.RefreshTokens.Add(new RefreshToken
-        {
-            UserId = user.Id,
-            TokenHash = _tokenService.HashToken(refreshToken),
-            ExpiresAt = _tokenService.GetRefreshTokenExpiry(),
-            CreatedAt = DateTime.UtcNow,
-        });
-
-        await _db.SaveChangesAsync();
-
-        return new AuthResponse(accessToken, refreshToken, user.Email);
+        return new AuthResult(AuthResultStatus.Success, _tokenService.CreateToken(user));
     }
 
     private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();

@@ -8,11 +8,7 @@ export function getStoredSession(): AuthSession | null {
 
   try {
     const parsed = JSON.parse(raw) as AuthSession
-    if (
-      typeof parsed.token === 'string' &&
-      typeof parsed.refreshToken === 'string' &&
-      typeof parsed.email === 'string'
-    ) {
+    if (typeof parsed.token === 'string' && typeof parsed.email === 'string') {
       return parsed
     }
   } catch {

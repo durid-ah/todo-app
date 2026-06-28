@@ -14,7 +14,6 @@ interface AuthCredentials {
 function toAuthSession(data: AuthResponse): AuthSession {
   return {
     token: data.token,
-    refreshToken: data.refreshToken,
     email: data.email,
   }
 }
