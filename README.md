@@ -16,7 +16,7 @@ Full-stack todo app with JWT authentication and per-user todo lists.
 todo-app/
 ├── backend/
 │   ├── TodoApp.Api/        # Web API (controllers, services, EF migrations)
-│   └── TodoApp.Api.Tests/  # xUnit tests (TodosController)
+│   └── TodoApp.Api.Tests/  # xUnit tests (AuthService, TodosController)
 ├── frontend/               # React + Vite UI
 └── TodoApp.slnx
 ```
@@ -88,7 +88,19 @@ Example requests are in [`backend/TodoApp.Api/TodoApp.Api.http`](backend/TodoApp
 dotnet test backend/TodoApp.Api.Tests
 ```
 
-Controller tests use EF Core InMemory and a mocked `ClaimsPrincipal` for user scoping.
+| Test class | Covers |
+|------------|--------|
+| `AuthServiceTests` | Sign-up/sign-in validation, duplicate email, credentials, JWT response |
+| `TodosControllerTests` | CRUD, user-scoped queries, title validation |
+
+Both use EF Core InMemory. Controller tests also set a mocked `ClaimsPrincipal` (`sub` claim) for `User.GetUserId()`.
+
+Run a single suite:
+
+```bash
+dotnet test backend/TodoApp.Api.Tests --filter "FullyQualifiedName~AuthServiceTests"
+dotnet test backend/TodoApp.Api.Tests --filter "FullyQualifiedName~TodosControllerTests"
+```
 
 ## Build
 
