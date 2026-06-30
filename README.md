@@ -96,3 +96,10 @@ Controller tests use EF Core InMemory and a mocked `ClaimsPrincipal` for user sc
 dotnet build
 cd frontend && npm run build
 ```
+
+## Design Decisions
+
+### Backend
+* Initially I started with minimal API, but, as I added more endpoints it made more sense to organize them into their own controllers
+* For authentication, a simple jwt authentication makes sense as it is easy to scale in the future
+* I chose to keep the logic in the controllers as much as possible (except for the auth) because EF core provides enough of an abstraction and adding more boilerplate will just make the code harder to read
