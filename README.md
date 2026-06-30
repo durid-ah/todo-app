@@ -115,3 +115,15 @@ cd frontend && npm run build
 * Initially I started with minimal API, but, as I added more endpoints it made more sense to organize them into their own controllers
 * For authentication, a simple jwt authentication makes sense as it is easy to scale in the future
 * I chose to keep the logic in the controllers as much as possible (except for the auth) because EF core provides enough of an abstraction and adding more boilerplate will just make the code harder to read
+
+### Frontend
+* UI: I decided to go ahead with `shadcn` for a UI library/design system. To keep the ui acceptable without wasting too much time
+* API Calls/State Management: `TanStack Query` will handle the caching, state management and error handling of API calls because it is fairly simple and I am already familiar with the library
+* I debated over using routing but the logic was simple enough to use some if statements
+
+## Ideas for the future:
+* token invalidation
+* adding due dates and priority ordering to the todo items, including some UI updates to indicate an item is overdue
+* looking at potentially implementing notifications and reminders through workers and the browser notification api
+* group todos by categories
+* sharing a list between multiple users
